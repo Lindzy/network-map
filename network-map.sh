@@ -74,7 +74,7 @@ print_connection_switch(){
 	local self_ip=$1
 	local self_mac=${switch_internal_mac[$self_ip,self]}
 	((group++))
-	switch_group=$group
+	local switch_group=$group
 	if [ ! $3 ]; then
 		output_node "$switch_group" "$2" "$self_mac" "Switch"
 	else 
@@ -86,7 +86,7 @@ print_connection_switch(){
 			fi
 		done
 	fi
-	switch_node_id=$node_count
+	local switch_node_id=$node_count
 	for port in ${switch_internal_ports[$self_ip]}; do
 		child_switch_ip=${switch_mapping_port[$self_ip,$port,child]}
 		parent_switch_ip=${switch_mapping_port[$self_ip,$port,parent]}
