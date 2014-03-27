@@ -11,11 +11,11 @@ snmp_switch_oid_mapper() {
         tmp_snmp_readout=$(snmpwalk -v2c -c 'cclubswitches' -ObentUq $ip $to_oid)
         #tmp_snmp_readout=${tmp_snmp_readout//.$to_oid./}
         OLDIFS=$IFS
-        IFS=$'\n'
+                IFS=$'\n'
         for item in $tmp_snmp_readout; do
                 IFS=' '
 		read -r id string <<< "$item"
-                tmp_to_mapping["${id##*.}"]="$(${5:-echo} $string)"
+                tmp_to_mapping["${id##${id%.*.*}.}"]="$(${5:-echo} $string)"
         done
 	IFS=OLDIFS
 	tmp_snmp_readout=$(snmpwalk -v2c -c 'cclubswitches' -ObentUq $ip $from_oid)
@@ -26,7 +26,7 @@ snmp_switch_oid_mapper() {
                 IFS=' '
 		read -r id string <<< "$item"
 		if [ "${string}" ]; then
-			rtn[$(${4:-echo} "$string")]="${tmp_to_mapping["${id##*.}"]}"
+			rtn[$(${4:-echo} "$string")]="${tmp_to_mapping["${id##${id%.*.*}.}"]}"
 		fi
         done
 	declare -p rtn
