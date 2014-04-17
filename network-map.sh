@@ -6,6 +6,10 @@ exit 1
 fi
 command -v /usr/sbin/arp >/dev/null 2>&1 || { echo >&2 "I require /usr/sbin/arp but it's not installed.  Aborting."; exit 1; }
 
+# We should find a way to automatically update this
+SWITCH_LIST="128.237.157.253 128.237.157.254"
+OUTPUT=$1
+
 source libsnmphelper.sh
 source libarphelper.sh
 source libjsonhelper.sh
@@ -19,9 +23,6 @@ declare -A switch_internal_ports
 
 eval "$(arp_mac_to_ip)"
 eval "$(arp_mac_to_dns)"
-
-# We should find a way to automatically update this
-SWITCH_LIST="128.237.157.253 128.237.157.254"
 
 
 echo "Will now query $SWITCH_LIST for connected macs, ports, and bridges information"
@@ -78,14 +79,27 @@ for ip in "${!switch_mapping_ip[@]}"; do
 	fi
 done
 
-
+# Explicity setup some outputs for generate_connections_list
 node_list=""
 link_list=""
 echo "Computing JSON output"
-generate_connections $parent_switch
+generate_connections_list $parent_switch
 
+
+# Save stdout to file discriptor 3
+exec 3>&1
+if [ -n "$OUTPUT" ]; then
+	#change stdout to be conntected to the input file
+    exec 3>$OUTPUT
+fi
+exec 4>&1
+exec 1>&3
 echo '{"nodes":['
 echo "${node_list%?}"
 echo '],"links":['
 echo "${link_list%?}"
 echo "]}"
+
+# Restore stdout and close temporary file description
+exec 1>&4 4>&-
+exec 3>&-

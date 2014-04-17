@@ -102,15 +102,15 @@ snmp_strip_results () {
 
 }
 snmp_switch_get_mac_to_bridge_port() {
-mac_to_bridge=$(snmp_switch_oid_mapper $1 1.3.6.1.2.1.17.4.3.1.1 1.3.6.1.2.1.17.4.3.1.2 __internal_format_mac)
-eval "$mac_to_bridge"
-bridge_to_port=$(snmp_switch_oid_mapper_key_to_value $1 1.3.6.1.2.1.17.1.4.1.2 1.3.6.1.2.1.31.1.1.1.1)
-bridge_to_port="declare -A bridge_to_port_mapping=${bridge_to_port#*=}"; eval "$bridge_to_port"
+    mac_to_bridge=$(snmp_switch_oid_mapper $1 1.3.6.1.2.1.17.4.3.1.1 1.3.6.1.2.1.17.4.3.1.2 __internal_format_mac)
+    eval "$mac_to_bridge"
+    bridge_to_port=$(snmp_switch_oid_mapper_key_to_value $1 1.3.6.1.2.1.17.1.4.1.2 1.3.6.1.2.1.31.1.1.1.1)
+    bridge_to_port="declare -A bridge_to_port_mapping=${bridge_to_port#*=}"; eval "$bridge_to_port"
 
-for i in "${!rtn[@]}"
-do
-  rtn[$i]=${bridge_to_port_mapping[${rtn[$i]}]}
-done
-declare -p rtn
+    for i in "${!rtn[@]}"
+    do
+      rtn[$i]=${bridge_to_port_mapping[${rtn[$i]}]}
+    done
+    declare -p rtn
 
 }
