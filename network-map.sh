@@ -86,13 +86,15 @@ echo "Computing JSON output"
 generate_connections_list $parent_switch
 
 
-# Save stdout to file discriptor 3
+# Make file descriptor 3 point to stdout
 exec 3>&1
 if [ -n "$OUTPUT" ]; then
-	#change stdout to be conntected to the input file
+    #Make file descriptor 3 point to output file
     exec 3>$OUTPUT
 fi
+#save stdout to fd 4
 exec 4>&1
+#make stdout point to fd 3 (which will be stdout or output file)
 exec 1>&3
 echo '{"nodes":['
 echo "${node_list%?}"
@@ -100,6 +102,7 @@ echo '],"links":['
 echo "${link_list%?}"
 echo "]}"
 
-# Restore stdout and close temporary file description
+# Restore stdout and close temporary file description 4
 exec 1>&4 4>&-
+# close fd 3
 exec 3>&-
